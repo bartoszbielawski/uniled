@@ -511,9 +511,13 @@ class UniledBleDevice(UniledDevice):
         for command in commands:
             if self._client.is_connected and command:
                 _LOGGER.debug("%s: Sending command: %s", self.name, command.hex())
+                # Most models want write-with-response; a few (SP661E) only
+                # answer when written without response.
                 reply = await self._client.write_gatt_char(
-                    self._write_char, command, True
-                )  # None)
+                    self._write_char,
+                    command,
+                    getattr(self._model, "write_with_response", True),
+                )
                 # await self._client.write_gatt_char(self._write_char, command, False) # Do not use!
                 if reply is not None:
                     _LOGGER.debug("%s: Command Reply: %s", self.name, repr(reply))

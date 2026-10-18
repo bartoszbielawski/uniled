@@ -78,6 +78,8 @@ class BanlanX661(UniledBleModel):
     exclusive_match: bool = True
     # Advertised name is unreliable ("LMB", truncated), name after the model
     use_model_name: bool = True
+    # The controller ignores state queries written with response
+    write_with_response: bool = False
 
     def __init__(self, id: int, name: str, info: str, data: bytes):
         super().__init__(

@@ -181,6 +181,14 @@ class NamingTests(unittest.TestCase):
         self.assertFalse(getattr(SP601E, "use_model_name", False))
 
 
+class WriteModeTests(unittest.TestCase):
+    def test_sp661e_writes_without_response(self):
+        self.assertFalse(SP661E.write_with_response)
+
+    def test_other_models_keep_default(self):
+        self.assertTrue(getattr(SP601E, "write_with_response", True))
+
+
 class DeviceConstructionTests(unittest.IsolatedAsyncioTestCase):
     """Regression: building the device must not touch attributes before __init__ sets them."""
 
