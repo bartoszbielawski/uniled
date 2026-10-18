@@ -162,6 +162,15 @@ class UniledBleDevice(UniledDevice):
         for model in UNILED_BLE_MODELS:
             match = model.match_ble_device(device, advertisement)
 
+            if match is True and getattr(model, "exclusive_match", False):
+                _LOGGER.debug(
+                    "Device '%s' (%s) identified as '%s' (exclusive match).",
+                    device.address,
+                    device.name,
+                    model.model_name,
+                )
+                return model
+
             if isinstance(match, UniledBleModel):
                 _LOGGER.debug(
                     "Device '%s' (%s) identified as '%s', by %s.",
