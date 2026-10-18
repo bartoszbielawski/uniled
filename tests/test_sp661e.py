@@ -157,5 +157,15 @@ class MatchTests(unittest.TestCase):
         self.assertIs(m, SP601E)
 
 
+class RestoreTests(unittest.TestCase):
+    def test_model_found_by_stored_name(self):
+        """A saved config entry only stores the model name; it must resolve to SP661E."""
+        self.assertIs(UniledBleDevice.match_model_name("SP661E"), SP661E)
+        self.assertIs(UniledBleDevice.match_model_name("SP601E"), SP601E)
+
+    def test_unknown_name_is_none(self):
+        self.assertIsNone(UniledBleDevice.match_model_name("LMB"))
+
+
 if __name__ == "__main__":
     unittest.main()
