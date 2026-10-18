@@ -1,11 +1,14 @@
 """Offline tests for the SP661E model (no Home Assistant, no Bluetooth).
 Run from the repo root:  python -m unittest tests.test_sp661e -v
 """
+
 import os
 import sys
 import unittest
 
-sys.path.append(os.path.join(os.path.dirname(__file__), "..", "custom_components", "uniled"))
+sys.path.append(
+    os.path.join(os.path.dirname(__file__), "..", "custom_components", "uniled")
+)
 
 from bleak.backends.device import BLEDevice
 from bleak.backends.scanner import AdvertisementData
@@ -105,15 +108,29 @@ class ParseTests(unittest.TestCase):
 
 class CommandTests(unittest.TestCase):
     def test_query(self):
-        self.assertEqual(SP661E.build_state_query(None).hex(" "), "53 02 00 01 00 01 01")
+        self.assertEqual(
+            SP661E.build_state_query(None).hex(" "), "53 02 00 01 00 01 01"
+        )
 
     def test_power(self):
-        self.assertEqual(SP661E.build_onoff_command(None, None, True).hex(" "), "53 50 00 01 00 02 01 01")
-        self.assertEqual(SP661E.build_onoff_command(None, None, False).hex(" "), "53 50 00 01 00 02 01 00")
+        self.assertEqual(
+            SP661E.build_onoff_command(None, None, True).hex(" "),
+            "53 50 00 01 00 02 01 01",
+        )
+        self.assertEqual(
+            SP661E.build_onoff_command(None, None, False).hex(" "),
+            "53 50 00 01 00 02 01 00",
+        )
 
     def test_brightness_solid_and_fx(self):
-        self.assertEqual(SP661E.build_brightness_command(None, FakeChannel(2), 255).hex(" "), "53 51 00 01 00 03 01 80 ff")
-        self.assertEqual(SP661E.build_brightness_command(None, FakeChannel(4), 0x40).hex(" "), "53 51 00 01 00 03 01 00 40")
+        self.assertEqual(
+            SP661E.build_brightness_command(None, FakeChannel(2), 255).hex(" "),
+            "53 51 00 01 00 03 01 80 ff",
+        )
+        self.assertEqual(
+            SP661E.build_brightness_command(None, FakeChannel(4), 0x40).hex(" "),
+            "53 51 00 01 00 03 01 00 40",
+        )
 
     def test_effects(self):
         exp = {
@@ -123,11 +140,16 @@ class CommandTests(unittest.TestCase):
             "Heart Beat": "53 53 00 01 00 03 01 04 03",
         }
         for name, frame in exp.items():
-            self.assertEqual(SP661E.build_effect_command(None, None, name).hex(" "), frame)
+            self.assertEqual(
+                SP661E.build_effect_command(None, None, name).hex(" "), frame
+            )
         self.assertIsNone(SP661E.build_effect_command(None, None, "Nope"))
 
     def test_speed(self):
-        self.assertEqual(SP661E.build_effect_speed_command(None, None, 8).hex(" "), "53 54 00 01 00 02 01 08")
+        self.assertEqual(
+            SP661E.build_effect_speed_command(None, None, 8).hex(" "),
+            "53 54 00 01 00 02 01 08",
+        )
         self.assertIsNone(SP661E.build_effect_speed_command(None, None, 0x80))
 
 
@@ -146,14 +168,22 @@ class MatchTests(unittest.TestCase):
 
     @staticmethod
     def dev():
-        return BLEDevice("AA:BB:CC:DD:D3:EA", "LMB", {}, )
+        return BLEDevice(
+            "AA:BB:CC:DD:D3:EA",
+            "LMB",
+            {},
+        )
 
     def test_sp661e_wins_over_sp601e(self):
-        m = UniledBleDevice.match_known_device(self.dev(), self.adv(bytes.fromhex("01007a5c123062d3ea000000")))
+        m = UniledBleDevice.match_known_device(
+            self.dev(), self.adv(bytes.fromhex("01007a5c123062d3ea000000"))
+        )
         self.assertIs(m, SP661E)
 
     def test_other_01_prefix_still_sp601e(self):
-        m = UniledBleDevice.match_known_device(self.dev(), self.adv(bytes.fromhex("01027a5c123062d3ea000000")))
+        m = UniledBleDevice.match_known_device(
+            self.dev(), self.adv(bytes.fromhex("01027a5c123062d3ea000000"))
+        )
         self.assertIs(m, SP601E)
 
 
@@ -173,7 +203,9 @@ class NamingTests(unittest.TestCase):
         # advertised name may be junk such as "3" or "LMB"
         for junk in ("3", "LMB", ""):
             self.assertEqual(
-                UniledBleDevice.human_readable_name(SP661E.model_name, junk, "AA:BB:CC:DD:D3:EA"),
+                UniledBleDevice.human_readable_name(
+                    SP661E.model_name, junk, "AA:BB:CC:DD:D3:EA"
+                ),
                 "SP661E (D3EA)",
             )
 
@@ -216,6 +248,7 @@ class DeviceConstructionTests(unittest.IsolatedAsyncioTestCase):
 
     def test_del_survives_failed_init(self):
         from lib.device import UniledDevice
+
         broken = UniledDevice.__new__(UniledDevice)  # __init__ never ran
         broken._ble_device = None
         UniledDevice.__del__(broken)  # must not raise

@@ -3,6 +3,7 @@
 Protocol notes: see docs/SP661E_PROTOCOL.md. Frames are
 `53 CMD 00 01 00 LEN DATA` on FFE1; control payloads start with channel `01`.
 """
+
 from __future__ import annotations
 from typing import Final
 
@@ -148,9 +149,11 @@ class BanlanX661(UniledBleModel):
                 ATTR_HA_EFFECT: self.str_if_key_in(
                     fx_id, BANLANX661_EFFECTS, UNILED_UNKNOWN
                 ),
-                ATTR_UL_EFFECT_TYPE: UNILED_EFFECT_TYPE_STATIC
-                if is_solid
-                else UNILED_EFFECT_TYPE_DYNAMIC,
+                ATTR_UL_EFFECT_TYPE: (
+                    UNILED_EFFECT_TYPE_STATIC
+                    if is_solid
+                    else UNILED_EFFECT_TYPE_DYNAMIC
+                ),
             }
         )
         if not is_solid:
