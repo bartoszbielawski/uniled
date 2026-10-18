@@ -181,5 +181,37 @@ class NamingTests(unittest.TestCase):
         self.assertFalse(getattr(SP601E, "use_model_name", False))
 
 
+class DeviceConstructionTests(unittest.IsolatedAsyncioTestCase):
+    """Regression: building the device must not touch attributes before __init__ sets them."""
+
+    @staticmethod
+    def make(ble_name, model_name):
+        ble = BLEDevice("AA:BB:CC:DD:D3:EA", ble_name, {})
+        adv = MatchTests.adv(bytes.fromhex("01007a5c123062d3ea000000"))
+        return UniledBleDevice({}, ble, adv, model_name)
+
+    async def test_name_with_junk_advertised_name(self):
+        dev = self.make("3", "SP661E")
+        self.assertIs(dev.model, SP661E)
+        self.assertEqual(dev.name, "SP661E (D3EA)")
+
+    async def test_model_resolved_from_advertisement(self):
+        dev = self.make("3", None)
+        self.assertIs(dev.model, SP661E)
+        self.assertEqual(dev.name, "SP661E (D3EA)")
+
+    async def test_other_model_keeps_advertised_name(self):
+        ble = BLEDevice("AA:BB:CC:DD:D3:EA", "SP601E-test", {})
+        adv = MatchTests.adv(bytes.fromhex("01027a5c123062d3ea000000"))
+        dev = UniledBleDevice({}, ble, adv, None)
+        self.assertEqual(dev.name, "SP601E-test")
+
+    def test_del_survives_failed_init(self):
+        from lib.device import UniledDevice
+        broken = UniledDevice.__new__(UniledDevice)  # __init__ never ran
+        broken._ble_device = None
+        UniledDevice.__del__(broken)  # must not raise
+
+
 if __name__ == "__main__":
     unittest.main()
