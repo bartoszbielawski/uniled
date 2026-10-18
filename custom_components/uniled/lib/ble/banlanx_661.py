@@ -76,6 +76,8 @@ class BanlanX661(UniledBleModel):
 
     # Tell the matcher not to continue to other models once this one hit
     exclusive_match: bool = True
+    # Advertised name is unreliable ("LMB", truncated), name after the model
+    use_model_name: bool = True
 
     def __init__(self, id: int, name: str, info: str, data: bytes):
         super().__init__(

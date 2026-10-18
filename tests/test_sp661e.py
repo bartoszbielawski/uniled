@@ -167,5 +167,19 @@ class RestoreTests(unittest.TestCase):
         self.assertIsNone(UniledBleDevice.match_model_name("LMB"))
 
 
+class NamingTests(unittest.TestCase):
+    def test_named_after_model_not_advertised_name(self):
+        self.assertTrue(SP661E.use_model_name)
+        # advertised name may be junk such as "3" or "LMB"
+        for junk in ("3", "LMB", ""):
+            self.assertEqual(
+                UniledBleDevice.human_readable_name(SP661E.model_name, junk, "AA:BB:CC:DD:D3:EA"),
+                "SP661E (D3EA)",
+            )
+
+    def test_other_models_keep_advertised_name(self):
+        self.assertFalse(getattr(SP601E, "use_model_name", False))
+
+
 if __name__ == "__main__":
     unittest.main()

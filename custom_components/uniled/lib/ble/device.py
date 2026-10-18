@@ -278,6 +278,12 @@ class UniledBleDevice(UniledDevice):
         """Get the name of the device."""
         if not self._ble_device:
             return self.model_name
+        if getattr(self._model, "use_model_name", False):
+            # The advertised name of these devices is unreliable (e.g. "LMB" or
+            # a truncated name), so name them after the model instead.
+            return self.human_readable_name(
+                self.model_name, self._ble_device.name or "", self._ble_device.address
+            )
         return self._ble_device.name or self._ble_device.address
 
     @property
