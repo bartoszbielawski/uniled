@@ -30,8 +30,6 @@ import logging
 
 _LOGGER = logging.getLogger(__name__)
 
-_LOGGER.warning("[sp661e] SP661E support loaded (diagnostic build 4)")
-
 BANLANX661_HEADER: Final = 0x53
 BANLANX661_HEADER_LENGTH: Final = 6
 BANLANX661_MSG_STATUS: Final = 0x02
@@ -82,8 +80,6 @@ class BanlanX661(UniledBleModel):
     use_model_name: bool = True
     # The controller ignores state queries written with response
     write_with_response: bool = False
-    # TEMPORARY diagnostics: log key steps at WARNING so they show in the HA log UI
-    trace: bool = True
 
     def __init__(self, id: int, name: str, info: str, data: bytes):
         super().__init__(
@@ -121,12 +117,7 @@ class BanlanX661(UniledBleModel):
         if len(data) < BANLANX661_MIN_STATUS_LENGTH:
             raise ParseNotificationError("Status packet too short")
 
-        _LOGGER.log(
-            logging.WARNING if self.trace else logging.DEBUG,
-            "[sp661e] %s: Good Status Message: %s",
-            device.name,
-            data.hex(),
-        )
+        _LOGGER.debug("%s: Good Status Message: %s", device.name, data.hex())
 
         if not device.master.features:
             device.master.features = [

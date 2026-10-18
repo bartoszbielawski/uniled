@@ -1,3 +1,17 @@
+> **Fork note: BanlanX SP661E support**
+>
+> This fork adds the single colour PWM controller **SP661E** (power, brightness, three
+> effects, effect speed) and fixes the `light` platform import on current Home Assistant
+> (`ATTR_COLOR_TEMP` was removed from `homeassistant.components.light`, which made every
+> UniLED entry fail with *Failed to set up* on HA 2026.10).
+>
+> - Protocol notes: [docs/SP661E_PROTOCOL.md](docs/SP661E_PROTOCOL.md)
+> - Install via HACS: add this repository as a custom repository (category *Integration*),
+>   enable beta versions and download the latest `-sp661e` release.
+> - SP661E is detected by manufacturer data starting `01 00`; it only answers state queries
+>   that are written *without* response, which is why it has its own model class.
+> - Not supported yet: music mode (the controller has no microphone), timers.
+
 [![hacs_badge](https://img.shields.io/badge/HACS-Default-41BDF5.svg?style=for-the-badge)](https://github.com/hacs/integration)
 [![BuyMeCoffee][buymecoffeebadge]][buymecoffee]
 [![GitHub Release][releases-shield]][releases]
