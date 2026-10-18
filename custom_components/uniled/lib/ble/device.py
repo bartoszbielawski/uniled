@@ -307,6 +307,13 @@ class UniledBleDevice(UniledDevice):
             return True
         return False
 
+    def _trace(self, msg: str, *args) -> None:
+        """Log at WARNING for models flagged `trace` (diagnostics), else DEBUG."""
+        if getattr(getattr(self, "_model", None), "trace", False):
+            _LOGGER.warning("[sp661e] " + msg, *args)
+        else:
+            _LOGGER.debug(msg, *args)
+
     ##
     ## Update Device
     ##
@@ -320,7 +327,7 @@ class UniledBleDevice(UniledDevice):
         if retry is None:
             retry = self.retry_count
 
-        _LOGGER.debug("%s: Update - Send State Query... (retrys=%s)", self.name, retry)
+        self._trace("%s: Update - Send State Query... (retrys=%s)", self.name, retry)
         self._notification_event.clear()
         if not await self.send(query, retry):
             return False
@@ -332,7 +339,7 @@ class UniledBleDevice(UniledDevice):
         if not self._notification_event.is_set():
             # Wait for actual response!
             async with self._operation_lock:
-                _LOGGER.debug(
+                self._trace(
                     "%s: Update - Awaiting %s seconds for status notification...",
                     self.name,
                     UNILED_BLE_NOTFICATION_TIMEOUT,
@@ -510,7 +517,7 @@ class UniledBleDevice(UniledDevice):
         to_send = len(commands)
         for command in commands:
             if self._client.is_connected and command:
-                _LOGGER.debug("%s: Sending command: %s", self.name, command.hex())
+                self._trace("%s: Sending command: %s", self.name, command.hex())
                 # Most models want write-with-response; a few (SP661E) only
                 # answer when written without response.
                 reply = await self._client.write_gatt_char(
@@ -564,7 +571,7 @@ class UniledBleDevice(UniledDevice):
                 ble_device_callback=lambda: self._device,
             )
 
-            _LOGGER.debug(
+            self._trace(
                 "%s: Connected '%s'; RSSI: %s", self.name, client.address, self.rssi
             )
             self._client = client
@@ -603,7 +610,7 @@ class UniledBleDevice(UniledDevice):
 
     async def _async_start_notify(self, context: Any = None) -> bool:
         """Start notification."""
-        _LOGGER.debug(
+        self._trace(
             "%s: Subscribe to '%s' notifications: %s",
             self.name,
             self.address,
@@ -636,7 +643,7 @@ class UniledBleDevice(UniledDevice):
         self, sender: BleakGATTCharacteristic, data: bytearray
     ) -> None:
         """Handle notification responses."""
-        _LOGGER.debug(
+        self._trace(
             "%s: Notification from '%s' [%s],\nData: %s",
             self.name,
             self.address,
