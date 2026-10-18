@@ -30,7 +30,7 @@ import logging
 
 _LOGGER = logging.getLogger(__name__)
 
-_LOGGER.warning("[sp661e] SP661E support loaded (diagnostic build 3)")
+_LOGGER.warning("[sp661e] SP661E support loaded (diagnostic build 4)")
 
 BANLANX661_HEADER: Final = 0x53
 BANLANX661_HEADER_LENGTH: Final = 6

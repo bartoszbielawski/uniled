@@ -20,7 +20,6 @@ from homeassistant.components.light import (
     ATTR_BRIGHTNESS,
     ATTR_COLOR_MODE,
     ATTR_COLOR_TEMP_KELVIN,
-    ATTR_COLOR_TEMP,
     ATTR_EFFECT,
     ATTR_RGB_COLOR,
     ATTR_RGBW_COLOR,
@@ -34,6 +33,10 @@ from homeassistant.components.light import (
     ColorMode,
     color_supported,
 )
+
+# Home Assistant removed the mired based ATTR_COLOR_TEMP constant from the
+# light platform; UniLED only uses it as an internal channel attribute key.
+ATTR_COLOR_TEMP = "color_temp"
 
 from .entity import (
     UniledUpdateCoordinator,
